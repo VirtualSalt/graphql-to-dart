@@ -3,6 +3,7 @@ class {{ className }} {
   {{#if typeName }}
   static final String typeName = "{{ typeName }}";
   {{/if}}
+
   static const possibleTypes = const {
     {{#each possibleTypes~}}
     {{this}}{{#unless @last}},
@@ -21,36 +22,25 @@ class {{ className }} {
     {{/unless}}
     {{~/each}}
    );
-
-
-  {{!-- 
-  ToJson get value => (
+  
+  /// Adds all fields from [other] to this `{{ className }}`,
+  /// validating that they are the same type
+  /// 
+  /// pre-existing values are not overwritten unless `overwrite: true`
+  void addAll(covariant {{ className }} other, { bool overwrite = true, }) {
+    assert(other?.value != null, "Cannot add all from null union value into $this from $other");
+    final _v = value;
     {{#each possibleTypes~}}
-    {{ camelCase this}}{{#unless @last}} ??
-    {{/unless}}
-    {{~/each}}
-   ) as ToJson;
-
-  factory {{ className }}.fromJson(Map<String, dynamic> json)
-     => deserializeFromJson(json);
-
-  Map<String, dynamic> toJson() => value.toJson();
-
-
-  static {{ ../className }} deserializeFromJson(Map<String, dynamic> json){
-    {{ className }} instance = {{ className }}.empty();
-    switch (json['__typename']) {
-      {{#each possibleTypes}}
-      case '{{this}}':
-        return instance..{{ camelCase this}} = {{ this }}.fromJson(json);
-      {{/each}}
-      default:
-        return instance;
+    if (other.{{ camelCase this}} != null){
+      assert(
+        _v == null || {{ camelCase this}} != null,
+        "Cannot add all from $other.value of type {{camelCase this}} into $this.value of type ${_v.runtimeType}",
+      );
+      {{ camelCase this}}.addAll(other.{{ camelCase this}}, overwrite: overwrite);
+      return null;
     }
+    {{/each}}
   }
-
-  static Map<String, dynamic> serializeToJson({{className}} instance) => instance.value.toJson();
-  --}}
 
 }
 
