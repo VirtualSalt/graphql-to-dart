@@ -1,4 +1,4 @@
-import { toPascalCase } from "@graphql-codegen/plugin-helpers";
+import { pascalCase as toPascalCase } from 'pascal-case';
 import { dedupe, arrayify, inputBaseType } from "./utils";
 import { GraphQLSchema, visit, parse, printSchema } from "graphql";
 
@@ -9,17 +9,17 @@ export interface AddInputHelpersConfig {
    * @default false
    */
   addInputHelpers?:
-    | boolean
-    | {
-        /**
-         * Explicitly add the given converters for the given object type classes to the class
-         */
-        explicitlyFor?: { [inputType: string]: string | string[] };
-        /*
-         * Exclude the given converters for the class. This can include Input types
-         */
-        exceptFor?: string[];
-      };
+  | boolean
+  | {
+    /**
+     * Explicitly add the given converters for the given object type classes to the class
+     */
+    explicitlyFor?: { [inputType: string]: string | string[] };
+    /*
+     * Exclude the given converters for the class. This can include Input types
+     */
+    exceptFor?: string[];
+  };
 }
 
 export default (
@@ -49,7 +49,7 @@ export default (
 
     const baseType = inputBaseType(inputType);
     let generateHelpersFor = arrayify(explicitlyFor[inputType] || []).map(
-      toPascalCase
+      s => toPascalCase(s)
     );
 
     if (

@@ -1,7 +1,8 @@
 import { GraphQLSchema } from "graphql";
 
 import { helpers as gqlHelpers } from "graphql-codegen-plugin-handlebars-helpers";
-import { toPascalCase } from "@graphql-codegen/plugin-helpers";
+
+import { pascalCase as toPascalCase } from 'pascal-case';
 
 import expectedGeneratedFileFor from "./expected-generated-file-for";
 import multilineComment from "./multiline-comment";
@@ -86,7 +87,7 @@ const helpers = wrapHelpers({
   callMethod
 });
 
-export interface Config extends AddInputHelpersConfig, MixinConfig {}
+export interface Config extends AddInputHelpersConfig, MixinConfig { }
 
 export default function configureHelpers(schema: GraphQLSchema, config) {
   return {

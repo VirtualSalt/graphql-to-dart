@@ -11,7 +11,7 @@ import configureHelpers, { Config as HelperConfig } from "./helpers";
 import { dedupe } from "./helpers/utils";
 import { basename, extname } from "path";
 
-type Scalars = Record<"String" | "Int" | "Float" | "Boolean" | "ID", string>;
+export type Scalars = Record<"String" | "Int" | "Float" | "Boolean" | "ID", string>;
 
 type Directive = string;
 type DartFileDirectives = {
@@ -107,7 +107,7 @@ export default function buildPlugin(
     if (route === "documents" && config.integrateGqlCodeGenAst) {
       config[route].exports.push(
         `export '${basename(documents[0].filePath, ".graphql") +
-          ".ast.g.dart"}' show document;`
+        ".ast.g.dart"}' show document;`
       );
     }
 
@@ -141,6 +141,8 @@ export default function buildPlugin(
       ...templateContext,
       ...flattenDocuments
     };
+
+
 
     try {
       return Handlebars.compile(rootTemplate)(handlebarsContext);

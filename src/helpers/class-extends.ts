@@ -1,4 +1,5 @@
-import { toPascalCase } from "@graphql-codegen/plugin-helpers";
+
+import { pascalCase as toPascalCase } from 'pascal-case';
 import fragmentClassNames from "./fragment-class-names";
 import { dedupe } from "./utils";
 
@@ -51,7 +52,7 @@ function inherit(inheritanceKeyword, ..._parents) {
   if (parents.length == 0) {
     return "";
   }
-  return `${inheritanceKeyword} ${parents.map(toPascalCase).join(", ")} `;
+  return `${inheritanceKeyword} ${parents.map(s => toPascalCase(s)).join(", ")} `;
 }
 
 // we extend from interfaces in dart to allow functionality

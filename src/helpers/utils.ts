@@ -192,3 +192,7 @@ export function eachUniqueBy(
 
   return blockResult;
 }
+
+export function copy<T = any>(m: T): T {
+  return Object.assign(Object.create(Object.getPrototypeOf(m)), m);
+}
