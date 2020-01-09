@@ -1,9 +1,10 @@
-import { Printer, Access, MemberFlags, Implementation } from './core';
+import { Printer, Access, MemberFlags, Implementation } from '.';
 import { indentMultiline } from '@graphql-codegen/visitor-plugin-common';
 import { MemberPrinter } from './member';
-export type ClassMethod = { methodAnnotations: string[]; args: MemberPrinter[]; implementation: string; name: string; access: Access; returnType: string | null; returnTypeAnnotations: string[]; flags: MemberFlags; implType: Implementation };
+import { AnnotationPrinter } from './annotation';
+export type ClassMethod = { annotations: AnnotationPrinter[]; args: MemberPrinter[]; implementation: string; name: string; access: Access; returnType: string | null; returnTypeAnnotations: string[]; flags: MemberFlags; implType: Implementation };
 export class FunctionPrinter extends Printer implements ClassMethod {
-    readonly methodAnnotations: string[];
+    readonly annotations: AnnotationPrinter[];
     readonly args: MemberPrinter[];
     readonly implementation: string;
 
@@ -12,7 +13,7 @@ export class FunctionPrinter extends Printer implements ClassMethod {
     readonly returnTypeAnnotations: string[];
     readonly flags: MemberFlags;
     readonly implType: Implementation;
-    private _getset: 'get' | 'none' = 'none';
+    private _getset: 'get' | 'none' | 'set' = 'none';
     get getset() {
         return this._getset;
     }
@@ -31,7 +32,7 @@ export class FunctionPrinter extends Printer implements ClassMethod {
         this.returnTypeAnnotations = options.returnTypeAnnotations || [];
         this.access = options.access || null;
         this.flags = options.flags || {};
-        this.methodAnnotations = options.methodAnnotations || [];
+        this.annotations = options.annotations || [];
         this.implType = options.implType || 'block';
         this.implementation = options.implementation;
         this._returnType = options.returnType;
@@ -46,6 +47,10 @@ export class FunctionPrinter extends Printer implements ClassMethod {
         this._getset = 'get';
         return this;
     }
+    set() {
+        this._getset = 'set';
+        return this;
+    }
 
     // set() {
     //     this._getset = 'set';
@@ -58,7 +63,7 @@ export class FunctionPrinter extends Printer implements ClassMethod {
 
     buildPieces(): string[] {
         const pieces = [
-            ...this.methodAnnotations.map(a => `@${a}\n`),
+            ...this.annotations.map(a => `${a.print()}\n`),
 
             this.flags.static ? 'static ' : null,
             this.flags.final ? 'final ' : null,

@@ -3,7 +3,7 @@ import { StringValueNode, NameNode } from 'graphql';
 const stripIndent = require('strip-indent');
 import { ConstructorPrinter } from './constructor';
 import { ClassMember, Kind, ClassMethod, Access, Implementation, MemberFlags, MemberPrinter, FunctionPrinter, Printer, } from './index';
-import { copy } from '../helpers/utils';
+import { copy } from '../../helpers/utils';
 type ClassFlags = 'abstract';
 
 export class ClassPrinter extends Printer {
@@ -19,6 +19,9 @@ export class ClassPrinter extends Printer {
     _annotations: string[] = [];
     private _members: MemberPrinter[] = [];
     _methods: FunctionPrinter[] = [];
+    _ismixin: boolean = false;
+    _mixinOns: string[] = [];
+    _mixins: string[] = [];
 
     constructor(private _name: string) {
         super();
@@ -30,7 +33,16 @@ export class ClassPrinter extends Printer {
         return this._members;
     }
 
+    with(mixin: string | string[]) {
+        this._mixins = Array.isArray(mixin) ? mixin : [mixin];
+        return this;
+    }
 
+    isMixin(on?: string | string[]) {
+        if (on) this._mixinOns = Array.isArray(on) ? on : [on];
+        this._ismixin = true;
+        return this;
+    }
 
     access(access: Access): ClassPrinter {
         this._access = access;
@@ -107,14 +119,22 @@ export class ClassPrinter extends Printer {
         return this;
     }
 
+    _buildName() {
+        return this.printAccessPrefix(this._access) + this.name;
+    }
     buildPieces(): string[] {
         const annotations = this._annotations.map(a => `@${a}\n`);
+        let buildMixinString = () => {
+            let text = `mixin ${this._buildName()}`;
+            if (!this._mixinOns.length) return text;
+            return text + ` on ${this._mixinOns.join(', ')}`
+        }
+
 
         const pieces = [
             ...annotations,
             this._flags.length ? this._flags.join(' ') : null,
-            'class',
-            this.printAccessPrefix(this._access) + this.name,
+            this._ismixin ? buildMixinString() : `class ${this._buildName()}`,
             this._extendStr.length > 0 ? `extends ${this._extendStr.join(', ')}` : null,
             this._implementsStr.length > 0 ? `implements ${this._implementsStr.join(', ')}` : null
         ].filter(f => f);

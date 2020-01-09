@@ -32,6 +32,8 @@
     "graphql-codegen-plugin-handlebars-helpers": "0.18.0",
     "graphql-codegen-plugin-helpers": "^0.18.2",
     "linewrap": "^0.2.1",
+    "pascal-case": "^3.1.1",
+    "strip-indent": "^3.0.0",
     "typescript": "3.7.3"
   },
   "devDependencies": {
@@ -39,7 +41,7 @@
     "@babel/node": "^7.2.2",
     "awesome-typescript-loader": "^5.2.1",
     "codegen-templates-scripts": "0.18.0",
-    "graphql": "14.1.1",
+    "graphql": "14.5.7",
     "graphql-code-generator": "^0.18.0",
     "raw-loader": "^4.0.0",
     "starwars-test-graphql-server": "0.2.0-alpha3",

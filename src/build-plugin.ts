@@ -1,5 +1,5 @@
 import * as Handlebars from "handlebars";
-import { GraphQLSchema } from "graphql";
+import { GraphQLSchema, visit } from "graphql";
 import {
   DocumentFile,
   schemaToTemplateContext,
@@ -9,8 +9,10 @@ import { PluginFunction } from "@graphql-codegen/plugin-helpers";
 import { flattenTypes } from "graphql-codegen-plugin-helpers";
 import configureHelpers, { Config as HelperConfig } from "./helpers";
 import { dedupe } from "./helpers/utils";
+import hackFragmentFields from './helpers/hack-fragment-fields';
 import { basename, extname } from "path";
-
+import { buildFragment } from './builders/selection-set';
+import { BuilderContext } from "./builders/document";
 export type Scalars = Record<"String" | "Int" | "Float" | "Boolean" | "ID", string>;
 
 type Directive = string;
@@ -111,11 +113,16 @@ export default function buildPlugin(
       );
     }
 
+
+
+
     const templateContext = schemaToTemplateContext(schema);
+
 
     const transformedDocuments = transformDocumentsFiles(schema, documents);
 
     const flattenDocuments = flattenTypes(transformedDocuments);
+
 
     registerMapWith<Handlebars.HelperDelegate>(
       (...args) => Handlebars.registerHelper(...args),
@@ -133,16 +140,27 @@ export default function buildPlugin(
       config.scalars || {},
       config.customScalars || {}
     );
-    const handlebarsContext = {
+    const handlebarsContext: BuilderContext = {
       outputFile,
       config,
       primitives: scalars,
-      scalars,
       ...templateContext,
+      scalars,
       ...flattenDocuments
     };
 
-
+    // register all frags
+    flattenDocuments.fragments.forEach(f => hackFragmentFields('add', {
+      hash: {
+        contextModels: f.innerModels,
+        fragments: null,
+        nestedFragments: f.fragmentsSpread,
+        fields: f.fields,
+        name: f.name
+      }
+    }));
+    flattenDocuments.fragments.forEach(f => buildFragment(handlebarsContext, f))
+    throw Error();
 
     try {
       return Handlebars.compile(rootTemplate)(handlebarsContext);

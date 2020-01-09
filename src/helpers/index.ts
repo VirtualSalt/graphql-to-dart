@@ -10,7 +10,7 @@ import configureClassExtends, {
   configureResolveMixins,
   MixinConfig
 } from "./class-extends";
-import configureResolveType from "./resolve-type";
+import configureResolveType, { configureResolveTypeV2 } from "./resolve-type";
 import hackFragmentFields from "./hack-fragment-fields";
 import ignoreType from "./ignore-type";
 import fragmentClassNames from "./fragment-class-names";
@@ -95,7 +95,8 @@ export default function configureHelpers(schema: GraphQLSchema, config) {
     dartName(name: string): string {
       return helpers.transformCharacters(name, config.transformCharacters);
     },
-    resolveType: configureResolveType(config),
+    resolveType: configureResolveType(config), //TODO: remove when completely refactored
+    resolveTypeV2: configureResolveTypeV2(config),
     classExtends: configureClassExtends(config),
     resolveMixins: configureResolveMixins(config),
     addInputHelpers: configurAddInputHelpers(schema, config)

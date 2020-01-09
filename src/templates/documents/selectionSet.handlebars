@@ -1,10 +1,10 @@
 {{#*inline "exposeField" ~}}
 {{#if type}}{{#if name}}
-  {{#if description }}{{ multilineComment description }}
-  {{/if}}
-  @JsonKey(name: r'{{rawName}}', required: {{isRequired}}, disallowNullValue: {{isRequired}})
-  {{ type }} get {{ name }} => fields.{{ schemaFieldName }};
-  set {{ name }} ({{ takeLastWord type }} {{ name }}) => fields.{{ schemaFieldName }} = {{ name }};
+{{#if description }}{{ multilineComment description }}
+{{/if}}
+@JsonKey(name: r'{{rawName}}', required: {{isRequired}}, disallowNullValue: {{isRequired}})
+{{ type }} get {{ name }} => fields.{{ schemaFieldName }};
+set {{ name }} ({{ takeLastWord type }} {{ name }}) => fields.{{ schemaFieldName }} = {{ name }};
 {{~/if}}{{/if}}
 {{~/inline}}
 
@@ -28,8 +28,8 @@
 }}
 {{else}}
 {{#each this}}
-  @JsonKey(name: r'{{name}}', required: {{isRequired}}, disallowNullValue: {{isRequired}})
-  {{ resolveType type
+@JsonKey(name: r'{{name}}', required: {{isRequired}}, disallowNullValue: {{isRequired}})
+{{ resolveType type
       'inline'
       ../../contextName
       ../../contextModels

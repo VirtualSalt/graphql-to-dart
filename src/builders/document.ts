@@ -1,9 +1,9 @@
 import { dartDirective, concat } from '../helpers/utils';
 import expectedGeneratedFileFor from '../helpers/expected-generated-file-for';
 import { Scalars, DartConfig } from '../build-plugin';
-import { ClassPrinter, MemberPrinter } from '../printers';
+import { ClassPrinter, MemberPrinter } from '../printers/core';
 import { pascalCase } from 'pascal-case';
-import { FlattenDocument } from 'graphql-codegen-plugin-helpers/dist/flatten-types';
+import { FlattenDocument, } from 'graphql-codegen-plugin-helpers/dist/flatten-types';
 import {
     SchemaTemplateContext
 } from "graphql-codegen-core";

@@ -1,5 +1,7 @@
 const { SafeString } = require("handlebars");
-
+import { SelectionSetFieldNode, } from 'graphql-codegen-core';
+import { FlattenModel } from 'graphql-codegen-plugin-helpers/dist/flatten-types';
+import { pascalCase as toPascalCase } from 'pascal-case';
 function interpolateTemplate(template, params) {
   const names = Object.keys(params);
   const vals = Object.values(params);
@@ -69,6 +71,7 @@ export default function configureResolveType({
   replaceTypes = {},
   irreducibleTypes = []
 }: ResolveTypeConfig) {
+
   function resolveType(
     type,
     jsonKeyInfo,
@@ -110,3 +113,53 @@ export default function configureResolveType({
   }
   return resolveType;
 }
+
+export type ResolveType = (field: SelectionSetFieldNode,
+  contextModels?: FlattenModel[]) => any;
+export function configureResolveTypeV2({
+  scalars = {},
+  replaceTypes = {},
+  irreducibleTypes = []
+}: ResolveTypeConfig): ResolveType {
+
+  function resolveType(
+    field: SelectionSetFieldNode,
+    contextModels: FlattenModel[] = [],
+  ) {
+    // TODO: Json Converter test
+    // field.type, field.isRequired, toPascalCase(field.name), fragment.innerModels, field.isArray, field.raw
+
+    let addSerializers = field.isRequired;
+    let fieldType =
+      asIrreducible(field.raw, irreducibleTypes) ||
+      (contextModels.filter(({ modelType }) => modelType === field.type).length
+        ? toPascalCase(field.name) + field.type
+        : primitives[field.type] || field.type || "Object");
+
+    if (replaceTypes[fieldType]) {
+      fieldType = replaceTypes[fieldType];
+    }
+    if (scalars[fieldType]) {
+      fieldType = scalars[fieldType];
+      if (!(fieldType in primitives)) {
+        return new SafeString(
+          jsonKey({
+            type: fieldType,
+            addSerializers
+            //className: className,
+            //required: isRequired,
+          }) + wrap(field.isArray, fieldType)
+        );
+      } else {
+        fieldType = primitives[fieldType];
+      }
+    }
+    return new SafeString(
+      jsonKey({
+        type: fieldType /*required: isRequired, className: className*/
+      }) + wrap(field.isArray, fieldType)
+    );
+  }
+  return resolveType;
+}
+

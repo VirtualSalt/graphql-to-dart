@@ -2,7 +2,8 @@ import { capitalize, dedupe } from "./utils";
 
 var fragmentFields = {};
 
-function getFields(name) {
+// TODO: type fields
+export function getFields(name) {
   const frag = fragmentFields[name];
   if (!frag) {
     console.error(`

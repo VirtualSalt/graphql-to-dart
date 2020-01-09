@@ -1,6 +1,8 @@
 
-import { Printer, Access, MemberFlags } from './core';
-
+import { Printer, Access, MemberFlags } from '.';
+import {
+    camelCase,
+} from "../../helpers/utils";
 export type ClassMember = { value: string; name: string; access: Access; type: string; annotations: string[]; flags: MemberFlags };
 export type jsonCofig = 'from_class' | 'custom_parse' | 'normal';
 export interface MemberJsonItem {
@@ -26,7 +28,9 @@ export class MemberPrinter extends Printer {
     private _tojson: MemberJsonItem;
 
     constructor(private _name: string, other: Partial<Omit<ClassMember, 'name'>> = {}) {
+
         super();
+        this._name = camelCase(_name);
         this.annotations = other.annotations && other.annotations.filter(v => v) || [];
         this.type = other.type;
         this.flags = {

@@ -13,45 +13,46 @@ mixin {{ className }} {{
     mixins=(resolveMixins fields)
     fragments=fragmentsSpread
 }} {
-  static final String typeName = "{{ typeName }}";
+static final String typeName = "{{ typeName }}";
 
-  {{> selectionSet }}
+{{> selectionSet }}
 
-  /// Copies fields from [other] into a new `{{ className }}`
-  static {{concat className 'SelectionSet'}} from({{ toPascalCase typeName }} other) =>
-    {{concat className 'SelectionSet'}}.from(other);
+/// Copies fields from [other] into a new `{{ className }}`
+static {{concat className 'SelectionSet'}} from({{ toPascalCase typeName }} other) =>
+{{concat className 'SelectionSet'}}.from(other);
 
-  static {{concat className 'SelectionSet'}} fromJson(Map<String, dynamic> json) =>
-    {{concat className 'SelectionSet'}}.fromJson(json);
+static {{concat className 'SelectionSet'}} fromJson(Map<String, dynamic> json) =>
+  {{concat className 'SelectionSet'}}.fromJson(json);
 
-}
+  }
 
-{{!-- don't need to pass fields in because we're extending the mixin --}}
-/// Materialized class that implements the fragment [{{ className }}]
-///
-/// Gives access to all the usual selection set helpers
-{{> selectionSetClass
+  {{!-- don't need to pass fields in because we're extending the mixin --}}
+  /// Materialized class that implements the fragment [{{ className }}]
+  ///
+  /// Gives access to all the usual selection set helpers
+  {{> selectionSetClass
       className=(concat className 'SelectionSet')
       typeName=typeName
       fragmentsSpread=(arrayify className)
       fields=''
       allFields=(hackFragmentFields "get" fragments=fragmentsSpread fields=fields)
 }}
-{{~/inline~}}
+  {{~/inline~}}
 
-{{~# if (hackFragmentFields "ensure_unique" name=name) ~}}
+  {{~# if (hackFragmentFields "ensure_unique" name=name) ~}}
 
-{{!-- add all fragment fields to the field hacker --}}
-    {{~ hackFragmentFields "add" name=name
+  {{!-- add all fragment fields to the field hacker --}}
+  {{~ hackFragmentFields "add" 
+  name=name
         fields=fields
         nestedFragments=fragmentsSpread 
         contextModels=innerModels
     ~}}
-{{!-- --}}
+  {{!-- --}}
 
-{{~#eachBackwards innerModels }}
+  {{~#eachBackwards innerModels }}
 
-{{~#unless (
+  {{~#unless (
   ignoreType
     (concat (toPascalCase ../name) modelType)
       @root.config.replaceTypes
@@ -59,7 +60,7 @@ mixin {{ className }} {{
       @root.config.irreducibleTypes
 )}}
 
-{{> selectionSetClass
+  {{> selectionSetClass
       className=(concat (toPascalCase ../name) modelType)
       typeName=schemaBaseType
       fragmentsSpread=fragmentsSpread
@@ -69,11 +70,11 @@ mixin {{ className }} {{
       contextName=(toPascalCase ../name)
 }}
 
-{{~/unless}}
+  {{~/unless}}
 
-{{/eachBackwards~}}
+  {{/eachBackwards~}}
 
-{{> fragmentMixin
+  {{> fragmentMixin
       className=(toPascalCase name)
       typeName=onType
       fields=(hackFragmentFields 'get' fragments=fragmentsSpread fields=fields)
@@ -82,4 +83,4 @@ mixin {{ className }} {{
       contextName=(toPascalCase name)
 }}
 
-{{~/if~}}
+  {{~/if~}}
